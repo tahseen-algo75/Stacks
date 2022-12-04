@@ -1,9 +1,4 @@
-package CSE214_Homework3;
-/*
- *  @author Tahseen Zaman
- *  ID : 114332480
- *  Recitation : 03
- */
+package Checker;
 
 public class CodeBlock {
     private String name;
