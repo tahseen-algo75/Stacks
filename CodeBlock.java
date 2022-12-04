@@ -1,4 +1,9 @@
-package CS214_Homework3;
+package CSE214_Homework3;
+/*
+ *  @author Tahseen Zaman
+ *  ID : 114332480
+ *  Recitation : 03
+ */
 
 public class CodeBlock {
     private String name;
@@ -67,3 +72,4 @@ public class CodeBlock {
         this.loopVariable = loopVariable;
     }
 }
+

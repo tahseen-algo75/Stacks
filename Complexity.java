@@ -1,4 +1,9 @@
-package CS214_Homework3;
+package CSE214_Homework3;
+/*
+ *  @author Tahseen Zaman
+ *  ID : 114332480
+ *  Recitation : 03
+ */
 
 public class Complexity {
     private int nPower;
@@ -38,7 +43,6 @@ public class Complexity {
     /* @ return 
      *   It's a method which prints human-readable Big-Oh notation as a String value. 
      */
-    /*
     public String toString() {
         String st = null;
         if (nPower == 1 && logPower == 1) {
@@ -54,28 +58,4 @@ public class Complexity {
         return st ;
     }
 }
- */
-public String toString(){
-    String string = "";
-    if(nPower == 0 && logPower == 0){
-        string +="O(1)";
-    }
-    else if(nPower == 1 && logPower==1){
-        string += "O(n * log(n))";
-    }
-    else if(nPower == 1){
-        string += "O(n)";
-    }
-    else if(logPower == 1){
-        string += "O(log(n))";
-    }
-    else if(logPower == 0 & nPower!=0){
-        string +="O(n^"+nPower+")";
-    }
-    else{
-        string+="O(n^"+nPower+" * log(n)^"+logPower+")";
-    }
-    return string;
-    }
-}
-    
+

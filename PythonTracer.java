@@ -1,5 +1,9 @@
-package CS214_Homework3;
-
+package CSE214_Homework3;
+/*
+ *  @author Tahseen Zaman
+ *  ID : 114332480
+ *  Recitation : 03
+ */
 
 import java.util.*;
 import java.io.*;
@@ -11,18 +15,15 @@ public class PythonTracer {
         BlockStack stack = new BlockStack();
         CodeBlock oldTop = new CodeBlock();
         Complexity oldTopComplexity = new Complexity();
-        
-        //String data;
+       
         int count = 0;
-        int indents = 0;
-        int countLine = 0;
-
+        
         File file = new File(filename);
         Scanner reader = new Scanner(file);
         while (reader.hasNext()) {
             String line = new String();
             line = reader.next();
-            if ((line != null) && !(line.startsWith("#"))) {
+            if(!line.isEmpty()&& !line.startsWith("#") ){ 
                 int spaceCount = line.indexOf(line.trim());
                 int indent = spaceCount / SPACE_COUNT;
                 while (indent < stack.size()-1) {
@@ -43,12 +44,17 @@ public class PythonTracer {
                         }
                     }
                     System.out.println("Leaving " + oldTop.getName() + " updating " + stack.peek().getName());
-                    System.out.println(stack.peek());
-                    
+                   
+                    System.out.println("block complexity = " + stack.pop().getBlockComplexity().toString()
+                            + "    "  +  " highest sub-complexity = " + stack.pop().getHighestSubComplexity().toString());
+                }
+            
+
                     String keyword = findKeyWord(line); 
-                    //if(!keyword.isEmpty()){
-                        
-                    if(keyword.equals("for")){
+                    
+                    if(!keyword.isEmpty()){
+                        int i = 0;
+                        if(keyword.equals("for")){
                         if(line.trim().endsWith("log_N:")){
                             Complexity complexity = new Complexity();
                             Complexity highestSubComplexity = new Complexity();
@@ -56,10 +62,15 @@ public class PythonTracer {
                             complexity.setLogPower(1);
                             highestSubComplexity.setNPower(0);
                             highestSubComplexity.setLogPower(0);
-                            CodeBlock logN = new CodeBlock(stack.peek().getName(), complexity, highestSubComplexity, "for");
-                            System.out.println("log_N : " + stack.peek().getName());
-                            System.out.println("Entering " + logN.getName() + logN.getLoopVariable());
-                            stack.push(logN);
+                             CodeBlock codeBlock = new CodeBlock((stack.peek().getName() + "." + i), complexity, highestSubComplexity, "for");
+
+                            System.out.println("Entering " + codeBlock.getName() + ":'" + codeBlock.getLoopVariable() + ":'");
+                           
+                            stack.push(codeBlock);
+ 
+                            System.out.println("log_N : " + stack.peek().getName() +  "     "  +   "block complexity = " + codeBlock.getBlockComplexity().toString()
+                            + "     "  +  " highest sub-complexity = " + codeBlock.getHighestSubComplexity().toString());
+
                             indent++;
                         }
                         else if(line.trim().endsWith("N:")){
@@ -69,10 +80,14 @@ public class PythonTracer {
                             complexity.setLogPower(0);
                             highestSubComplexity.setNPower(0);
                             highestSubComplexity.setLogPower(0);
-                            CodeBlock logN = new CodeBlock(stack.peek().getName() , complexity, highestSubComplexity, "for");
+                            CodeBlock codeBlock = new CodeBlock((stack.peek().getName() + "." + i) , complexity, highestSubComplexity, "for");
+
+
                             System.out.println("N : " + stack.peek().getName());
-                            System.out.println("Entering " + logN.getName() + logN.getLoopVariable());
-                            stack.push(logN);
+                            System.out.println("Entering " + codeBlock.getName() + codeBlock.getLoopVariable());
+                            stack.push(codeBlock);
+
+                            
                             indent++;
                         }
                     }
@@ -84,17 +99,62 @@ public class PythonTracer {
                         complexity.setLogPower(0);
                         highestSubComplexity.setNPower(0);
                         highestSubComplexity.setNPower(0);
-                        CodeBlock codeBlock = new CodeBlock("Block 1.2", complexity, highestSubComplexity, "while");
                         
-                        System.out.println(codeBlock.getName()+ codeBlock.getLoopVariable());
+                        CodeBlock codeBlock = new CodeBlock("Block 1.2", complexity, highestSubComplexity, " while");
+                        System.out.println("Entering " + codeBlock.getName()+ ":" + codeBlock.getLoopVariable() + " ");
+
                         stack.push(codeBlock);
-                        
+
+                        System.out.println("block complexity = " + codeBlock.getBlockComplexity().toString()
+                            + "    "  +  " highest sub-complexity = " + codeBlock.getHighestSubComplexity().toString());
+                        }
+                        else{
+                            Complexity complexity = new Complexity();
+                            complexity.setNPower(0);
+                            complexity.setLogPower(0);
+                            Complexity highestSubComplexity = new Complexity();
+                            highestSubComplexity.setNPower(0);
+                            highestSubComplexity.setNPower(0);
+     
+                            CodeBlock codeBlock = new CodeBlock("Block 1", complexity,  highestSubComplexity, "def");
+                            System.out.println("Entering " + codeBlock.getName() + ":'" + codeBlock.getLoopVariable() + "'");
+                           
+                            stack.push(codeBlock);
+     
+                            System.out.println("log_N : " + stack.peek().getName() +  "     " + "block complexity = " + codeBlock.getBlockComplexity().toString()
+                                + "    "  +  " highest sub-complexity = " + codeBlock.getHighestSubComplexity().toString());
+                            }
+                        }
+                        else if(!stack.isEmpty() && stack.peek().getName().equals("while")){
+                        if(line.contains("/=")){
+                            Complexity complexity= new Complexity();
+                            complexity.setNPower(0);
+                            complexity.setLogPower(1);
+                            stack.peek().setBlockComplexity(complexity);
+                        }
+                        else if(line.contains(("-="))){
+                            Complexity complexity = new Complexity();
+                            complexity.setNPower(1);
+                            complexity.setLogPower(0);
+                            stack.peek().setBlockComplexity(complexity);
+                        }
                     }
+                   
                 }
+                 
             }
-        }
-        return null;
-    }
+     
+              while(stack.size()>1){
+                 oldTop = stack.pop();
+                  if(oldTopComplexity.getNPower()>stack.peek().getHighestSubComplexity().getNPower()){
+                     stack.peek().setHighestSubComplexity(oldTopComplexity);
+                 }
+             }
+            return oldTopComplexity;
+     
+    
+                }
+           
     public static String findKeyWord(String st){
         
         if(st.trim().startsWith("for") && st.contains("for")) {
@@ -114,7 +174,7 @@ public class PythonTracer {
 }
     public static void main(String[] args) {
         Scanner reader = new Scanner(System.in);
-        System.out.println("Please enter a file name (or 'quit' to quit): quit ");
+        //System.out.println("Please enter a file name (or 'quit' to quit): quit ");
         
         try{
             String fileName = reader.nextLine().trim();
@@ -125,8 +185,14 @@ public class PythonTracer {
             traceFile(fileName);
         }
         } catch(Exception e){
-            System.out.println("Sorry the file is not found. Please try again");
+            //System.out.println("Sorry the file is not found. Please try again");
         }
         reader.close();
     }
 }
+
+
+
+
+
+
